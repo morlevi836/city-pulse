@@ -79,6 +79,11 @@ Create a `.env` file inside the `server` folder with:
 SIRI_BASE_URL=https://eliabs-siri-ex.s3.amazonaws.com/siri-data/
 MUNICIPALITIES_URL=https://eliabs-siri-ex.s3.eu-west-3.amazonaws.com/municipalities_multi.geojson
 PORT=5000
+```
+
+### Frontend (`client/.env`)
+
+If you have any environment variables for the client, create `.env` inside `client` folder.
 
 ---
 
