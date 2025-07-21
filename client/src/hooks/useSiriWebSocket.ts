@@ -7,11 +7,9 @@ export function useSiriWebSocket() {
   >([]);
 
   useEffect(() => {
-    const ws = new WebSocket(
-      `${window.location.protocol === "https:" ? "wss" : "ws"}://${
-        window.location.hostname
-      }:3000/ws`
-    );
+    const wsUrl = import.meta.env.VITE_BACKEND_WS_URL;
+
+    const ws = new WebSocket(wsUrl);
 
     ws.onopen = () => console.log("WS connected");
 
@@ -24,7 +22,6 @@ export function useSiriWebSocket() {
             vehicles: message.vehicles,
           };
 
-          // שמירה של עד 100 רשומות
           setHistory((prev) => [...prev.slice(-99), newSnapshot]);
         }
       } catch (e) {
