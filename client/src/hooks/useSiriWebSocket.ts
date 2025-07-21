@@ -2,7 +2,9 @@ import { useEffect, useState } from "react";
 import type { VehicleType } from "../types/vehicle";
 
 export function useSiriWebSocket() {
-  const [vehicles, setVehicles] = useState<VehicleType[]>([]);
+  const [history, setHistory] = useState<
+    { timestamp: number; vehicles: VehicleType[] }[]
+  >([]);
 
   useEffect(() => {
     const ws = new WebSocket(
@@ -16,18 +18,25 @@ export function useSiriWebSocket() {
     ws.onmessage = (event) => {
       try {
         const message = JSON.parse(event.data);
-        if (message.vehicles) setVehicles(message.vehicles);
+        if (message.vehicles) {
+          const newSnapshot = {
+            timestamp: Date.now(),
+            vehicles: message.vehicles,
+          };
+
+          // שמירה של עד 100 רשומות
+          setHistory((prev) => [...prev.slice(-99), newSnapshot]);
+        }
       } catch (e) {
         console.error("WS message parse error", e);
       }
     };
 
     ws.onerror = (error) => console.error("WS error", error);
-
     ws.onclose = () => console.log("WS disconnected");
 
     return () => ws.close();
   }, []);
 
-  return vehicles;
+  return history;
 }

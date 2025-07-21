@@ -46,7 +46,8 @@ export default function LeafletMap({
     siriData,
     selectedVehicleRef,
     onSelectVehicle,
-    mapBounds
+    mapBounds,
+    municipalitiesData
   );
 
   useSelectedFeatureCenterEffect(mapRef, selectedFeatureCenter, userInteracted);

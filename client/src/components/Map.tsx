@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from "react";
+import { useMemo, useCallback, useState } from "react";
 import { useMunicipalities } from "../api/municipalities";
 import { useSiriWebSocket } from "../hooks/useSiriWebSocket";
 import LoadingScreen from "./LoadingScreen";
@@ -6,20 +6,36 @@ import MunicipalitySelector from "./MunicipalitySelector";
 import LeafletMap from "./LeafletMap";
 import type { Feature, GeoJsonProperties, Geometry } from "geojson";
 import useMunicipalityFilter from "../hooks/useMunicipalityFilter";
+import { TimelineControls } from "./TimelineControls";
+import { useTimeline } from "../hooks/useTimeline";
 
 export default function Map() {
-  // Data fetching
   const { data: municipalitiesData } = useMunicipalities();
-  const siriData = useSiriWebSocket();
+  const siriHistory = useSiriWebSocket();
+  const {
+    timelineIndex,
+    setTimelineIndex,
+    isPlaying,
+    setIsPlaying,
+    playbackSpeed,
+    setPlaybackSpeed,
+    isLive,
+  } = useTimeline(siriHistory);
 
-  // State management
   const [selectedMunicipality, setSelectedMunicipality] = useState("");
   const [selectedVehicleRef, setSelectedVehicleRef] = useState<string | null>(
     null
   );
   const [userInteracted, setUserInteracted] = useState(false);
 
-  // Derived state
+  const siriData = useMemo(() => {
+    if (!siriHistory.length) return [];
+    if (timelineIndex === null || timelineIndex >= siriHistory.length) {
+      return siriHistory[siriHistory.length - 1].vehicles;
+    }
+    return siriHistory[timelineIndex]?.vehicles || [];
+  }, [siriHistory, timelineIndex]);
+
   const { filteredSiriData, selectedMunicipalityCenter } =
     useMunicipalityFilter(selectedMunicipality, siriData, municipalitiesData);
 
@@ -32,7 +48,6 @@ export default function Map() {
       .filter(Boolean) as string[];
   }, [municipalitiesData]);
 
-  // Event handlers
   const handleMunicipalityChange = useCallback((municipality: string) => {
     setSelectedMunicipality(municipality);
     setUserInteracted(false);
@@ -46,12 +61,33 @@ export default function Map() {
     setUserInteracted(true);
   }, []);
 
+  const handlePlayPause = useCallback(() => {
+    if (isLive) {
+      setTimelineIndex(0);
+    }
+    setIsPlaying(!isPlaying);
+  }, [isPlaying, isLive, setTimelineIndex, setIsPlaying]);
+
+  const handleSpeedChange = useCallback(
+    (speed: number) => {
+      setPlaybackSpeed(speed);
+    },
+    [setPlaybackSpeed]
+  );
+
+  const handleTimelineChange = useCallback(
+    (index: number | null) => {
+      setTimelineIndex(index);
+    },
+    [setTimelineIndex]
+  );
+
   if (!municipalitiesData) {
     return <LoadingScreen municipalitiesData={municipalitiesData} />;
   }
 
   return (
-    <div className="relative h-screen w-full">
+    <div className="relative h-screen w-full overflow-hidden">
       <MunicipalitySelector
         options={municipalityOptions}
         selected={selectedMunicipality}
@@ -67,6 +103,19 @@ export default function Map() {
         userInteracted={userInteracted}
         onUserInteraction={handleUserInteraction}
       />
+
+      {siriHistory.length > 0 && (
+        <TimelineControls
+          isPlaying={isPlaying}
+          isLive={isLive}
+          timelineIndex={timelineIndex}
+          siriHistory={siriHistory}
+          playbackSpeed={playbackSpeed}
+          onPlayPause={handlePlayPause}
+          onTimelineChange={handleTimelineChange}
+          onSpeedChange={handleSpeedChange}
+        />
+      )}
     </div>
   );
 }

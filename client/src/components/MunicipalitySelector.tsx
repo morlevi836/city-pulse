@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef, useMemo, memo, useCallback } from "react";
+import { useState, useEffect, useRef, memo, useCallback } from "react";
+import { useFilteredOptions } from "../hooks/useFilteredOptions";
 
 type Props = {
   options: string[];
@@ -22,7 +23,6 @@ function MunicipalitySelector({ options, selected, onChange }: Props) {
     [onChange]
   );
 
-  // Handle keyboard navigation
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
       if (e.key === "ArrowDown") {
@@ -44,7 +44,6 @@ function MunicipalitySelector({ options, selected, onChange }: Props) {
     [filteredOptions, handleOptionSelect, highlightedIndex]
   );
 
-  // Scroll highlighted item into view
   useEffect(() => {
     if (listRef.current && highlightedIndex >= 0) {
       const items = listRef.current.querySelectorAll("li");
@@ -109,20 +108,6 @@ function MunicipalitySelector({ options, selected, onChange }: Props) {
       )}
     </div>
   );
-}
-
-// Custom hook for options filtering
-function useFilteredOptions(options: string[], searchTerm: string) {
-  const sortedOptions = useMemo(() => {
-    return [...options].sort((a, b) => a.localeCompare(b, "he"));
-  }, [options]);
-
-  const filteredOptions = useMemo(() => {
-    const allOptions = ["הצג את כל הערים", ...sortedOptions];
-    return allOptions.filter((name) => name.includes(searchTerm));
-  }, [sortedOptions, searchTerm]);
-
-  return { sortedOptions, filteredOptions };
 }
 
 export default memo(MunicipalitySelector);

@@ -3,8 +3,15 @@ import L from "leaflet";
 import type { VehicleType } from "../types/vehicle";
 import { busIcon, selectedBusIcon } from "../constants/icons";
 import moment from "moment";
-
-moment.locale("he");
+import type {
+  Feature,
+  FeatureCollection,
+  GeoJsonProperties,
+  Geometry,
+  MultiPolygon,
+  Polygon,
+} from "geojson";
+import * as turf from "@turf/turf";
 
 interface VehicleMarkerOptions extends L.MarkerOptions {
   vehicleRef: string;
@@ -18,7 +25,8 @@ export default function useVehiclesLayer(
   siriData: VehicleType[],
   selectedVehicleRef: string | null,
   onSelectVehicle: (vehicleRef: string | null) => void,
-  mapBounds: L.LatLngBounds | null
+  mapBounds: L.LatLngBounds | null,
+  municipalitiesData: FeatureCollection<Geometry, GeoJsonProperties>
 ) {
   const markersRef = useRef<
     Record<string, { current: VehicleMarker; popup: L.Popup }>
@@ -28,16 +36,25 @@ export default function useVehiclesLayer(
     if (!mapRef.current || !vehiclesLayerRef.current || !mapBounds) return;
 
     const filteredVehicles = siriData.filter((vehicle) => {
-      return (
-        vehicle.Latitude != null &&
-        vehicle.Longitude != null &&
-        mapBounds.contains(L.latLng(vehicle.Latitude, vehicle.Longitude))
+      if (
+        vehicle.Latitude == null ||
+        vehicle.Longitude == null ||
+        !mapBounds.contains(L.latLng(vehicle.Latitude, vehicle.Longitude))
+      ) {
+        return false;
+      }
+
+      return isInAnyMunicipality(
+        vehicle.Latitude,
+        vehicle.Longitude,
+        municipalitiesData
       );
     });
 
     vehiclesLayerRef.current.eachLayer((layer) => {
       if (layer instanceof L.Marker) {
         const vehicleRef = (layer.options as VehicleMarkerOptions).vehicleRef;
+
         if (!filteredVehicles.some((v) => v.VehicleRef === vehicleRef)) {
           vehiclesLayerRef.current?.removeLayer(layer);
           delete markersRef.current[vehicleRef];
@@ -47,10 +64,6 @@ export default function useVehiclesLayer(
 
     filteredVehicles.forEach((vehicle) => {
       const existingMarker = markersRef.current[vehicle.VehicleRef ?? ""];
-
-      if (vehicle.VehicleRef === "68527903") {
-        console.log(`Creating popup for vehicle: ${vehicle.DistanceFromStop}`);
-      }
 
       if (existingMarker) {
         existingMarker.current.setLatLng([
@@ -88,6 +101,7 @@ export default function useVehiclesLayer(
     mapRef,
     vehiclesLayerRef,
     onSelectVehicle,
+    municipalitiesData,
   ]);
 }
 
@@ -212,4 +226,26 @@ function createVehiclePopupContent(vehicle: VehicleType): string {
       <p><strong>🔢 מיקום התחנה במסלול:</strong> מספר ${Order}</p>
     </div>
   `;
+}
+
+function isInAnyMunicipality(
+  lat: number,
+  lng: number,
+  municipalities: FeatureCollection
+): boolean {
+  const point = turf.point([lng, lat]);
+
+  return municipalities.features.some((feature) => {
+    const geometry = feature.geometry;
+    if (
+      geometry &&
+      (geometry.type === "Polygon" || geometry.type === "MultiPolygon")
+    ) {
+      return turf.booleanPointInPolygon(
+        point,
+        feature as Feature<Polygon | MultiPolygon>
+      );
+    }
+    return false;
+  });
 }
