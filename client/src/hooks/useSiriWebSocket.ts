@@ -7,7 +7,12 @@ export function useSiriWebSocket() {
   >([]);
 
   useEffect(() => {
-    const wsUrl = import.meta.env.VITE_BACKEND_WS_URL;
+    const baseUrl = import.meta.env.VITE_BACKEND_BASE_URL;
+    const wsProtocol = baseUrl.startsWith("https") ? "wss" : "ws";
+
+    const url = new URL(baseUrl);
+
+    const wsUrl = `${wsProtocol}://${url.host}/ws`;
 
     const ws = new WebSocket(wsUrl);
 
