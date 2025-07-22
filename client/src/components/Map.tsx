@@ -10,8 +10,11 @@ import { TimelineControls } from "./TimelineControls";
 import { useTimeline } from "../hooks/useTimeline";
 
 export default function Map() {
+  // Fetch municipalities and real-time vehicle data
   const { data: municipalitiesData } = useMunicipalities();
   const siriHistory = useSiriWebSocket();
+
+  // Timeline-related state from custom hook
   const {
     timelineIndex,
     setTimelineIndex,
@@ -22,12 +25,14 @@ export default function Map() {
     isLive,
   } = useTimeline(siriHistory);
 
+  // UI state
   const [selectedMunicipality, setSelectedMunicipality] = useState("");
   const [selectedVehicleRef, setSelectedVehicleRef] = useState<string | null>(
     null
   );
   const [userInteracted, setUserInteracted] = useState(false);
 
+  // Determine which vehicles to show based on timeline
   const siriData = useMemo(() => {
     if (!siriHistory.length) return [];
     if (timelineIndex === null || timelineIndex >= siriHistory.length) {
@@ -36,9 +41,11 @@ export default function Map() {
     return siriHistory[timelineIndex]?.vehicles || [];
   }, [siriHistory, timelineIndex]);
 
+  // Filter vehicles based on selected municipality
   const { filteredSiriData, selectedMunicipalityCenter } =
     useMunicipalityFilter(selectedMunicipality, siriData, municipalitiesData);
 
+  // Extract municipality names for selector
   const municipalityOptions = useMemo(() => {
     if (!municipalitiesData) return [];
     return municipalitiesData.features
@@ -48,6 +55,7 @@ export default function Map() {
       .filter(Boolean) as string[];
   }, [municipalitiesData]);
 
+  // Handlers for user interaction
   const handleMunicipalityChange = useCallback((municipality: string) => {
     setSelectedMunicipality(municipality);
     setUserInteracted(false);
@@ -61,9 +69,10 @@ export default function Map() {
     setUserInteracted(true);
   }, []);
 
+  // Timeline control handlers
   const handlePlayPause = useCallback(() => {
     if (isLive) {
-      setTimelineIndex(0);
+      setTimelineIndex(0); // Restart playback from beginning if in live mode
     }
     setIsPlaying(!isPlaying);
   }, [isPlaying, isLive, setTimelineIndex, setIsPlaying]);
@@ -82,6 +91,7 @@ export default function Map() {
     [setTimelineIndex]
   );
 
+  // Show loading screen until municipality data is loaded
   if (!municipalitiesData) {
     return <LoadingScreen municipalitiesData={municipalitiesData} />;
   }

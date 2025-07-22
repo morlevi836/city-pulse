@@ -25,11 +25,15 @@ export default function LeafletMap({
   userInteracted,
   onUserInteraction,
 }: LeafletMapProps) {
+  // Refs to store the Leaflet map and layer instances
   const mapRef = useRef<L.Map | null>(null);
   const geoJsonLayerRef = useRef<L.LayerGroup | null>(null);
   const vehiclesLayerRef = useRef<L.LayerGroup | null>(null);
+
+  // State to track the current map bounds
   const [mapBounds, setMapBounds] = useState<L.LatLngBounds | null>(null);
 
+  // Initializes the map and sets up event listeners
   useMapInitialization(
     mapRef,
     geoJsonLayerRef,
@@ -38,8 +42,10 @@ export default function LeafletMap({
     onUserInteraction
   );
 
+  // Renders municipality polygons on the map
   useMunicipalitiesLayer(mapRef, geoJsonLayerRef, municipalitiesData);
 
+  // Renders vehicle markers on the map and updates based on selection and bounds
   useVehiclesLayer(
     mapRef,
     vehiclesLayerRef,
@@ -50,8 +56,10 @@ export default function LeafletMap({
     municipalitiesData
   );
 
+  // Adjusts map view to selected municipality center when applicable
   useSelectedFeatureCenterEffect(mapRef, selectedFeatureCenter, userInteracted);
 
+  // Container for the Leaflet map
   return (
     <div
       id="leaflet-map-container"

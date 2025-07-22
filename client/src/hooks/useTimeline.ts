@@ -1,4 +1,3 @@
-// hooks/useTimeline.ts
 import { useState, useEffect } from "react";
 import type { VehicleType } from "../types/vehicle";
 
