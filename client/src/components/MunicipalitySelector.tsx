@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, memo, useCallback } from "react";
+import React from "react";
 import { useFilteredOptions } from "../hooks/useFilteredOptions";
 
 type Props = {
@@ -8,14 +8,14 @@ type Props = {
 };
 
 function MunicipalitySelector({ options, selected, onChange }: Props) {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [highlightedIndex, setHighlightedIndex] = useState(0);
-  const [collapsed, setCollapsed] = useState(false);
-  const listRef = useRef<HTMLUListElement>(null);
+  const [searchTerm, setSearchTerm] = React.useState("");
+  const [highlightedIndex, setHighlightedIndex] = React.useState(0);
+  const [collapsed, setCollapsed] = React.useState(false);
+  const listRef = React.useRef<HTMLUListElement>(null);
 
   const { filteredOptions } = useFilteredOptions(options, searchTerm);
 
-  const handleOptionSelect = useCallback(
+  const handleOptionSelect = React.useCallback(
     (option: string) => {
       onChange(option === "הצג את כל הערים" ? "" : option);
       setSearchTerm(option);
@@ -23,7 +23,7 @@ function MunicipalitySelector({ options, selected, onChange }: Props) {
     [onChange]
   );
 
-  const handleKeyDown = useCallback(
+  const handleKeyDown = React.useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
       if (e.key === "ArrowDown") {
         e.preventDefault();
@@ -44,7 +44,7 @@ function MunicipalitySelector({ options, selected, onChange }: Props) {
     [filteredOptions, handleOptionSelect, highlightedIndex]
   );
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (listRef.current && highlightedIndex >= 0) {
       const items = listRef.current.querySelectorAll("li");
       items[highlightedIndex]?.scrollIntoView({ block: "nearest" });
@@ -110,4 +110,4 @@ function MunicipalitySelector({ options, selected, onChange }: Props) {
   );
 }
 
-export default memo(MunicipalitySelector);
+export default React.memo(MunicipalitySelector);

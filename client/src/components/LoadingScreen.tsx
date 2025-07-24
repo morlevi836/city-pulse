@@ -1,5 +1,5 @@
-import type { FeatureCollection, GeoJsonProperties, Geometry } from "geojson";
 import React from "react";
+import type { FeatureCollection, GeoJsonProperties, Geometry } from "geojson";
 
 type LoadingScreenProps = {
   municipalitiesData:

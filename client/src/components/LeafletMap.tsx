@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import React from "react";
 import type { FeatureCollection, GeoJsonProperties, Geometry } from "geojson";
 import type { VehicleType } from "../types/vehicle";
 import useMapInitialization from "../hooks/useMapInitialization";
@@ -26,12 +26,12 @@ export default function LeafletMap({
   onUserInteraction,
 }: LeafletMapProps) {
   // Refs to store the Leaflet map and layer instances
-  const mapRef = useRef<L.Map | null>(null);
-  const geoJsonLayerRef = useRef<L.LayerGroup | null>(null);
-  const vehiclesLayerRef = useRef<L.LayerGroup | null>(null);
+  const mapRef = React.useRef<L.Map | null>(null);
+  const geoJsonLayerRef = React.useRef<L.LayerGroup | null>(null);
+  const vehiclesLayerRef = React.useRef<L.LayerGroup | null>(null);
 
   // State to track the current map bounds
-  const [mapBounds, setMapBounds] = useState<L.LatLngBounds | null>(null);
+  const [mapBounds, setMapBounds] = React.useState<L.LatLngBounds | null>(null);
 
   // Initializes the map and sets up event listeners
   useMapInitialization(

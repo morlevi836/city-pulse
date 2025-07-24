@@ -1,11 +1,11 @@
-import { useMemo } from "react";
+import React from "react";
 
 export function useFilteredOptions(options: string[], searchTerm: string) {
-  const sortedOptions = useMemo(() => {
+  const sortedOptions = React.useMemo(() => {
     return [...options].sort((a, b) => a.localeCompare(b, "he"));
   }, [options]);
 
-  const filteredOptions = useMemo(() => {
+  const filteredOptions = React.useMemo(() => {
     const allOptions = ["הצג את כל הערים", ...sortedOptions];
     return allOptions.filter((name) => name.includes(searchTerm));
   }, [sortedOptions, searchTerm]);

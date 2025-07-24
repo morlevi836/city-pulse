@@ -1,12 +1,12 @@
-import { useEffect, useState } from "react";
+import React from "react";
 import type { VehicleType } from "../types/vehicle";
 
 export function useSiriWebSocket() {
-  const [history, setHistory] = useState<
+  const [history, setHistory] = React.useState<
     { timestamp: number; vehicles: VehicleType[] }[]
   >([]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const baseUrl = import.meta.env.VITE_BACKEND_BASE_URL;
     const wsProtocol = baseUrl.startsWith("https") ? "wss" : "ws";
 

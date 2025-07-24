@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import React from "react";
 import L from "leaflet";
 import * as turf from "@turf/turf";
 import type {
@@ -19,7 +19,7 @@ export default function useMunicipalitiesLayer(
   geoJsonLayerRef: React.RefObject<L.LayerGroup | null>,
   municipalitiesData: FeatureCollection<Geometry, GeoJsonProperties>
 ) {
-  useEffect(() => {
+  React.useEffect(() => {
     // Ensure map and layer group are initialized
     if (!mapRef.current || !geoJsonLayerRef.current) return;
 

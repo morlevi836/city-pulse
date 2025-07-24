@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import React from "react";
 import L from "leaflet";
 import type { VehicleType } from "../types/vehicle";
 import { busIcon, selectedBusIcon } from "../constants/icons";
@@ -23,11 +23,11 @@ export default function useVehiclesLayer(
   municipalitiesData: FeatureCollection<Geometry, GeoJsonProperties>
 ) {
   // Store markers for vehicles keyed by vehicleRef
-  const markersRef = useRef<
+  const markersRef = React.useRef<
     Record<string, { current: VehicleMarker; popup: L.Popup }>
   >({});
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (!mapRef.current || !vehiclesLayerRef.current || !mapBounds) return;
 
     // Filter vehicles inside map bounds and municipalities

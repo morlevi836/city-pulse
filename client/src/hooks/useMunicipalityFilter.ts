@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React from "react";
 import * as turf from "@turf/turf";
 import type {
   Feature,
@@ -15,12 +15,11 @@ export default function useMunicipalityFilter(
   siriData: VehicleType[],
   municipalitiesData?: FeatureCollection<Geometry, GeoJsonProperties>
 ) {
-  const [filteredSiriData, setFilteredSiriData] = useState(siriData);
-  const [selectedMunicipalityCenter, setSelectedMunicipalityCenter] = useState<
-    [number, number] | null
-  >(null);
+  const [filteredSiriData, setFilteredSiriData] = React.useState(siriData);
+  const [selectedMunicipalityCenter, setSelectedMunicipalityCenter] =
+    React.useState<[number, number] | null>(null);
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (!municipalitiesData || !selectedMunicipality) {
       setFilteredSiriData(siriData);
       setSelectedMunicipalityCenter(null);

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import React from "react";
 import L from "leaflet";
 import { DEFAULT_CENTER, DEFAULT_ZOOM } from "../constants/mapConstants";
 
@@ -10,7 +10,7 @@ export default function useMapInitialization(
   setMapBounds: React.Dispatch<React.SetStateAction<L.LatLngBounds | null>>,
   onUserInteraction: () => void
 ) {
-  useEffect(() => {
+  React.useEffect(() => {
     // Prevent initializing the map multiple times
     if (mapRef.current) return;
 

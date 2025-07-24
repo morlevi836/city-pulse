@@ -1,4 +1,4 @@
-import { useMemo, useCallback, useState } from "react";
+import React from "react";
 import { useMunicipalities } from "../api/municipalities";
 import { useSiriWebSocket } from "../hooks/useSiriWebSocket";
 import LoadingScreen from "./LoadingScreen";
@@ -26,14 +26,14 @@ export default function Map() {
   } = useTimeline(siriHistory);
 
   // UI state
-  const [selectedMunicipality, setSelectedMunicipality] = useState("");
-  const [selectedVehicleRef, setSelectedVehicleRef] = useState<string | null>(
-    null
-  );
-  const [userInteracted, setUserInteracted] = useState(false);
+  const [selectedMunicipality, setSelectedMunicipality] = React.useState("");
+  const [selectedVehicleRef, setSelectedVehicleRef] = React.useState<
+    string | null
+  >(null);
+  const [userInteracted, setUserInteracted] = React.useState(false);
 
   // Determine which vehicles to show based on timeline
-  const siriData = useMemo(() => {
+  const siriData = React.useMemo(() => {
     if (!siriHistory.length) return [];
     if (timelineIndex === null || timelineIndex >= siriHistory.length) {
       return siriHistory[siriHistory.length - 1].vehicles;
@@ -46,7 +46,7 @@ export default function Map() {
     useMunicipalityFilter(selectedMunicipality, siriData, municipalitiesData);
 
   // Extract municipality names for selector
-  const municipalityOptions = useMemo(() => {
+  const municipalityOptions = React.useMemo(() => {
     if (!municipalitiesData) return [];
     return municipalitiesData.features
       .map(
@@ -56,35 +56,35 @@ export default function Map() {
   }, [municipalitiesData]);
 
   // Handlers for user interaction
-  const handleMunicipalityChange = useCallback((municipality: string) => {
+  const handleMunicipalityChange = React.useCallback((municipality: string) => {
     setSelectedMunicipality(municipality);
     setUserInteracted(false);
   }, []);
 
-  const handleSelectVehicle = useCallback((vehicleRef: string | null) => {
+  const handleSelectVehicle = React.useCallback((vehicleRef: string | null) => {
     setSelectedVehicleRef(vehicleRef);
   }, []);
 
-  const handleUserInteraction = useCallback(() => {
+  const handleUserInteraction = React.useCallback(() => {
     setUserInteracted(true);
   }, []);
 
   // Timeline control handlers
-  const handlePlayPause = useCallback(() => {
+  const handlePlayPause = React.useCallback(() => {
     if (isLive) {
       setTimelineIndex(0); // Restart playback from beginning if in live mode
     }
     setIsPlaying(!isPlaying);
   }, [isPlaying, isLive, setTimelineIndex, setIsPlaying]);
 
-  const handleSpeedChange = useCallback(
+  const handleSpeedChange = React.useCallback(
     (speed: number) => {
       setPlaybackSpeed(speed);
     },
     [setPlaybackSpeed]
   );
 
-  const handleTimelineChange = useCallback(
+  const handleTimelineChange = React.useCallback(
     (index: number | null) => {
       setTimelineIndex(index);
     },

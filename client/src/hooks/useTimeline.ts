@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React from "react";
 import type { VehicleType } from "../types/vehicle";
 
 export function useTimeline(
@@ -7,14 +7,14 @@ export function useTimeline(
     vehicles: VehicleType[];
   }[]
 ) {
-  const [timelineIndex, setTimelineIndex] = useState<number | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [playbackSpeed, setPlaybackSpeed] = useState(1);
+  const [timelineIndex, setTimelineIndex] = React.useState<number | null>(null);
+  const [isPlaying, setIsPlaying] = React.useState(false);
+  const [playbackSpeed, setPlaybackSpeed] = React.useState(1);
 
   const isLive =
     timelineIndex === null || timelineIndex === siriHistory.length - 1;
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (!isPlaying || isLive || !siriHistory.length) return;
 
     const interval = setInterval(() => {
